@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import UseTrailer from "../Hook/UseTrailer";
-import UseWatchList from "../Hook/UseWatchList";
+import UseTrailer from "../Hook/useTrailer";
+import useWatchList from "../Hook/useWatchList";
 import UseLiked from "../Hook/UseLiked";
 
 export default function MovieCard({ movie }) {
@@ -9,7 +9,7 @@ export default function MovieCard({ movie }) {
   const trailerKey = UseTrailer(movie.id);
 
   const { likedIds, toggleLike } = UseLiked();
-  const { watchlist, toggleWatchlist } = UseWatchList();
+  const { watchlist, toggleWatchlist } = useWatchList();
 
   const isLiked = likedIds?.includes(movie.id);
   const isWatchlisted = watchlist?.includes(movie.id);
@@ -97,7 +97,10 @@ export default function MovieCard({ movie }) {
               src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1`}
               title="Trailer"
               frameBorder="0"
-              allow="autoplay; encrypted-media"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+              loading="lazy"
+              referrerPolicy="no-referrer"
               allowFullScreen
             ></iframe>
             <button

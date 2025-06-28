@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const EditProfile = () => {
   const { id } = useParams();
@@ -13,7 +14,7 @@ const EditProfile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/auth/${id}`, {
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/auth/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setForm({
@@ -24,6 +25,7 @@ const EditProfile = () => {
         });
       } catch (err) {
         console.error("Error loading user data", err);
+        toast.error("Failed to load profile data.");
       }
     };
     fetchProfile();
@@ -41,6 +43,13 @@ const EditProfile = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // ✅ Validation before sending request
+    if (!form.name.trim() || !form.username.trim()) {
+      toast.error("Name and Username cannot be empty.");
+      return;
+    }
+
     setLoading(true);
     try {
       let avatarUrl = form.avatarUrl;
@@ -48,55 +57,66 @@ const EditProfile = () => {
       if (avatarFile) {
         const avatarData = new FormData();
         avatarData.append("file", avatarFile);
-        const uploadRes = await axios.post("http://localhost:5000/api/auth/upload-avatar", avatarData, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const uploadRes = await axios.post(
+          `${import.meta.env.VITE_API_URL}/auth/upload-avatar`,
+          avatarData,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
         avatarUrl = uploadRes.data.avatarUrl;
       }
 
       await axios.put(
-        `http://localhost:5000/api/auth/${id}`,
+        `http://localhost:8080/api/auth/me`,
         { ...form, avatarUrl },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      alert("✅ Profile updated successfully!");
+
+      toast.success("Profile updated successfully!");
       navigate(`/profile/${id}`);
     } catch (err) {
       console.error("Error updating profile", err);
+      toast.error("Error updating profile. Please try again.");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white flex justify-center items-center px-4">
+    <div className="bg-gradient-to-r from-yellow-400 to-gray-900 h-screen flex items-center justify-center">
       <form
         onSubmit={handleSubmit}
-        className="bg-gray-800 p-6 rounded-lg shadow-md w-full max-w-md"
+        className="bg-gray-950 p-4 rounded-lg shadow-md w-full max-w-md"
       >
-        <h2 className="text-2xl font-bold mb-4">Edit Profile</h2>
+        <h2 className="text-2xl font-bold mb-4">Update Profile</h2>
+
         <label className="block mb-2 text-sm font-medium">Name</label>
         <input
           type="text"
           name="name"
           value={form.name}
           onChange={handleChange}
-          className="w-full mb-4 p-2 rounded bg-gray-700 border border-gray-600 text-white"
+          className="w-full mb-4 p-2 rounded bg-gray-700 outline-none"
+          required
         />
+
         <label className="block mb-2 text-sm font-medium">Username</label>
         <input
           type="text"
           name="username"
           value={form.username}
           onChange={handleChange}
-          className="w-full mb-4 p-2 rounded bg-gray-700 border border-gray-600 text-white"
+          className="w-full mb-4 p-2 rounded bg-gray-700 outline-none text-white"
+          required
         />
+
         <label className="block mb-2 text-sm font-medium">Bio</label>
         <textarea
           name="bio"
           value={form.bio}
           onChange={handleChange}
-          className="w-full mb-4 p-2 rounded bg-gray-700 border border-gray-600 text-white"
+          className="w-full mb-4 p-2 rounded bg-gray-700 outline-none text-white"
         />
+
         <label className="block mb-2 text-sm font-medium">Avatar</label>
         <input
           type="file"
@@ -104,13 +124,15 @@ const EditProfile = () => {
           onChange={handleAvatarChange}
           className="w-full mb-4 p-2 rounded bg-gray-700 text-white"
         />
+
         {form.avatarUrl && (
-          <img src={form.avatarUrl} alt="Avatar Preview" className="w-20 h-20 rounded-full mb-4" />
+          <img src={form.avatarUrl} alt="Avatar Preview" className="w-20 h-15 rounded-full mb-4" />
         )}
+
         <button
           type="submit"
           disabled={loading}
-          className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white w-full"
+          className="bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded text-white w-full"
         >
           {loading ? "Saving..." : "Save Changes"}
         </button>

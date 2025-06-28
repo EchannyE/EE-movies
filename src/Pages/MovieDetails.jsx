@@ -29,6 +29,71 @@ const MovieDetails = () => {
     fetchMovie();
   }, [id]);
 
+useEffect(() => {
+  const fetchFavoriteStatus = async () => {
+    if (!isAuthenticated) return;
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/favorites/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setIsFavorite(res.data.isFavorite);
+    } catch (err) {
+      console.error("Failed to fetch favorite status:", err);
+    }
+  };
+
+  fetchFavoriteStatus();
+}, [id, isAuthenticated]);
+
+
+const handleFavorite = async () => {
+  if (!isAuthenticated) return navigate('/login');
+  try {
+    const token = localStorage.getItem('token');
+    const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/favorites`, 
+      { movieId: id },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    setIsFavorite(res.data.isFavorite); // backend should return updated state
+  } catch (err) {
+    console.error("Failed to toggle favorite:", err);
+  }
+};
+
+const handleRating = async (value) => {
+  if (!isAuthenticated) return navigate('/login');
+  try {
+    setRating(value); // optimistic UI
+    const token = localStorage.getItem('token');
+    await axios.post(`${import.meta.env.VITE_BACKEND_URL}/ratings`, 
+      { movieId: id, rating: value },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+  } catch (err) {
+    console.error("Failed to save rating:", err);
+  }
+};
+
+
+useEffect(() => {
+  const fetchUserRating = async () => {
+    if (!isAuthenticated) return;
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/ratings/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setRating(res.data.rating);
+    } catch (err) {
+      console.error("Failed to fetch user rating:", err);
+    }
+  };
+
+  fetchUserRating();
+}, [id, isAuthenticated]);
+
+
   if (!movie) {
     return <p className="text-white text-center mt-10">Loading movie details...</p>;
   }
@@ -37,23 +102,13 @@ const MovieDetails = () => {
     ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
     : 'https://via.placeholder.com/500x750?text=No+Image';
 
-  const handleFavorite = () => {
-    if (!isAuthenticated) return navigate('/login');
-    setIsFavorite((prev) => !prev);
-    // TODO: API call
-  };
-
-  const handleRating = (value) => {
-    if (!isAuthenticated) return navigate('/login');
-    setRating(value);
-    // TODO: API call
-  };
+  
 
   return (
-    <div className=" mx-auto text-white bg-gray-950 px-0">
-      <div className="flex flex-col md:flex-row gap-6">
+    <div className=" mx-auto text-white  px-0 md:px-6 py-8 max-w-6xl ">
+      <div className="flex flex-col md:flex-row gap-6 ">
         {/* Poster */}
-        <div className="md:w-1/3">
+        <div className="md:w-1/3 mb-6 md:mb-0 ">
           <img
             src={imageUrl}
             alt={movie.title}

@@ -1,19 +1,29 @@
 import React, { useState } from "react";
 import MovieCard from "../Components/MovieCard";
 import UseLiked from "../Hook/UseLiked";
-import UseWatchList from "../Hook/UseWatchList"; // Import the UseWatchList hook
+import useWatchList from "../Hook/useWatchList"; // Corrected: Import the renamed hook
 import toast from "react-hot-toast";
 import instance from "../Api/Axios"; // Assuming you need Axios for clear all functionality
 
 export default function Watchlist() {
     const { likedIds, toggleLike } = UseLiked();
     // Consume watchlist state and functions from the UseWatchList hook
-    const { watchlist, loading: watchlistLoading, error: watchlistError, toggleWatchlist, refetchWatchlist } = UseWatchList();
+    // Ensure you destructure the values you need, DO NOT try to render the whole object
+    const { watchlist, loading: watchlistLoading, error: watchlistError, toggleWatchlist, refetchWatchlist } = useWatchList(); // Corrected: Use the renamed hook
 
     const [showClearConfirmation, setShowClearConfirmation] = useState(false); // State for confirmation modal
 
-    
-    // Removed unused handleRemoveFromWatchlist function
+    // Function to handle removing a movie from watchlist
+    // This now directly calls the toggleWatchlist from the hook
+    const handleRemoveFromWatchlist = async (movieId) => {
+        try {
+            await toggleWatchlist(movieId); // Use the hook's toggle function to remove
+            toast.success("Removed from watchlist!");
+        } catch (err) {
+            toast.error("Failed to remove movie from watchlist.");
+            console.error("Failed to remove movie:", err);
+        }
+    };
 
     // Function to clear the entire watchlist
     const handleClearWatchlist = async () => {
@@ -45,7 +55,8 @@ export default function Watchlist() {
                 refetchWatchlist();
                 toast.success("Watchlist cleared successfully!");
             } else {
-                toast.error("Failed to clear watchlist.");
+                toast.error(res?.data?.message || "Failed to clear watchlist.");
+
             }
         } catch (err) {
             toast.error("Failed to clear watchlist.");
@@ -68,7 +79,7 @@ export default function Watchlist() {
                 {!isLoading && watchlist.length > 0 && (
                     <button
                         onClick={handleClearWatchlist}
-                        className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-md transition duration-200"
+                        className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md transition duration-200"
                     >
                         Clear All
                     </button>
@@ -85,7 +96,7 @@ export default function Watchlist() {
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                     {watchlist.map((movie) => (
                         <MovieCard
-                            key={movie.id || movie._id} // Use movie.id or movie._id
+                            key={movie.id || movie._id} // Use movie.id or movie._id for key
                             movie={movie}
                             isAuthenticated={!!localStorage.getItem("token")} // Pass isAuthenticated prop
                             // No need to pass likedIds/toggleLike/onRemoveFromWatchlist if MovieCard uses its own hooks
@@ -103,7 +114,7 @@ export default function Watchlist() {
                         <div className="flex justify-center gap-4">
                             <button
                                 onClick={confirmClearWatchlist}
-                                className="bg-yellow-600 hover:bg-yellow-700 text-white px-5 py-2 rounded-md transition duration-200"
+                                className="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-md transition duration-200"
                             >
                                 Yes, Clear
                             </button>

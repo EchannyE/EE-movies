@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import MovieCard from '../components/MovieCard';
+import MovieCard from '../Components/MovieCard';
 
 const Movies = () => {
   const [movies, setMovies] = useState([]);
@@ -46,7 +46,11 @@ const Movies = () => {
   };
 
   useEffect(() => {
-    fetchMovies(1); // initial load
+    const fetchInitialMovies = async () => {
+      await fetchMovies(1); // initial load
+    };
+    fetchInitialMovies();
+    // eslint-disable-next-line
   }, [API_KEY]);
 
   const loadMore = () => {
@@ -106,7 +110,7 @@ const Movies = () => {
         <button
           onClick={loadMore}
           disabled={loadingMore}
-          className="bg-yellow-600 hover:bg-blue-700 text-white px-6 py-2 rounded transition"
+          className="bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-2 rounded transition"
         >
           {loadingMore ? 'Loading...' : 'Load More'}
         </button>

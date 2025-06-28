@@ -36,15 +36,15 @@ export default function HeroBanner() {
           </p>
           <div className="flex gap-4 py-2 px-4">
             
-            <Link to="/movies" className="bg-yellow-500 px-7 py-2 rounded-md hover:bg-yellow-700 transition">
-                Browser More
-              </Link>
             <Link
               to="/signup"
-              className="bg-transparent border border-yellow-300 text-yellow-300 px-7 py-2 rounded-md hover:bg-yellow-400 hover:text-black transition"
+              className="bg-yellow-500 px-7 py-2 rounded-md hover:bg-yellow-700 transition"
             >
-              Get Started
+              Sign Up free
             </Link>
+            <Link to="/movies" className="bg-transparent border border-yellow-300 text-yellow-300 px-7 py-2 rounded-md hover:bg-yellow-400 hover:text-black transition">
+                Browser More
+              </Link>
           </div>
         </div>
       </div>

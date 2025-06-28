@@ -9,6 +9,8 @@ const Navbar = () => {
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem('theme') === 'dark');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
+ 
+
 
   useEffect(() => {
     if (darkMode) {
@@ -19,6 +21,8 @@ const Navbar = () => {
       localStorage.setItem('theme', 'light');
     }
   }, [darkMode]);
+
+
 
   useEffect(() => {
     const welcome = localStorage.getItem('welcome');
@@ -57,6 +61,7 @@ const Navbar = () => {
 
         <div className="hidden lg:flex items-center gap-6">
           <Link to="/movies" className="hover:text-yellow-400 transition duration-200">Movies</Link>
+          <Link to="signup" className="hover:text-yellow-400 transition duration-200">SignUp</Link>
           <Link to="/watchlist" className="hover:text-yellow-400 transition duration-200">Watchlist</Link>
           <Link to="/profile" className="hover:text-yellow-400 transition duration-200 flex items-center gap-1">
             <UserCircle2 size={18} />
@@ -82,7 +87,7 @@ const Navbar = () => {
 
           <button
             onClick={toggleDarkMode}
-            className="bg-gray-700 text-white px-4 py-1 rounded-md hover:bg-gray-600 transition flex items-center gap-2"
+            className="bg-gray-950 text-white px-4 py-1 rounded-md hover:bg-gray-600 transition flex items-center gap-2"
           >
             {darkMode ? <Sun size={18} /> : <Moon size={18} />}
             
@@ -99,6 +104,7 @@ const Navbar = () => {
         {isMenuOpen && (
           <div className="absolute top-full left-0 w-full bg-gray-900 flex flex-col gap-4 items-center py-4 shadow-lg border-t border-gray-700 lg:hidden">
             <Link to="/movies" className="hover:text-yellow-400" onClick={() => setIsMenuOpen(false)}>Movies</Link>
+            <Link to="/signup" className="hover:text-yellow-400" onClick={() => setIsMenuOpen(false)}>SignUp</Link>
             <Link to="/profile" className="hover:text-yellow-400 flex items-center gap-1" onClick={() => setIsMenuOpen(false)}>
               <UserCircle2 size={18} /> Profile
             </Link>

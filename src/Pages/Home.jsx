@@ -42,7 +42,7 @@ export default function Home() {
   };
 
   return (
-    <div className="space-y-6 bg-gray-950">
+    <div className="space-y-6">
       {featuredMovie && <HeroBanner movie={featuredMovie} />}
 
       <div className="p-4 flex gap-4 flex-wrap">
@@ -69,7 +69,7 @@ export default function Home() {
         </select>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {movies.map((movie) => (
           <MovieCard
             key={movie.id}
